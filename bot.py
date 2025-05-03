@@ -1,13 +1,13 @@
 import logging
 import random
 import os
-from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
 # Загрузка переменных окружения
-load_dotenv()
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+PORT = int(os.getenv("PORT", 8443))
+WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
 # Настройка логгирования
 logging.basicConfig(
@@ -64,7 +64,19 @@ def main() -> None:
     app.add_handler(CommandHandler("coin", coin))
     app.add_handler(CommandHandler("random", random_number))
 
-    app.run_polling()
+    # Настройка вебхука для Render
+    if WEBHOOK_URL:
+        app.run_webhook(
+            listen="0.0.0.0",
+            port=PORT,
+            secret_token=None,
+            webhook_url=WEBHOOK_URL,
+            cert=None
+        )
+        logger.info("Бот запущен через вебхук")
+    else:
+        app.run_polling()
+        logger.info("Бот запущен в режиме поллинга")
 
 if __name__ == "__main__":
     main()
