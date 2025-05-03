@@ -5,7 +5,7 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
 # Загрузка переменных окружения
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TOKEN="7740053320:AAFq1GEhVLilJ9Deb-8bMyH3q0levz0pOQ4"
 PORT = int(os.getenv("PORT", 8443))
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
