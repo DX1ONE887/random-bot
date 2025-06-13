@@ -6,7 +6,7 @@ from telegram.ext import Application, CommandHandler, ContextTypes
 
 # Загрузка переменных окружения
 TOKEN="7740053320:AAFq1GEhVLilJ9Deb-8bMyH3q0levz0pOQ4"
-PORT = int(os.getenv("PORT", 8443))
+PORT = int(os.getenv("PORT", 8080))
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
 # Настройка логгирования
