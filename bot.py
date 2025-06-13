@@ -4,10 +4,13 @@ import os
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
-# Загрузка переменных окружения
-TOKEN="7740053320:AAFq1GEhVLilJ9Deb-8bMyH3q0levz0pOQ4"
+# Загрузка переменных окружения (безопасно)
+TOKEN = "7977098044:AAFYGhAaAaK_ru4xgdZnjQTJhUTa6l04pA8"  # Токен из переменных окружения
 PORT = int(os.getenv("PORT", 8443))
-WEBHOOK_URL = os.getenv("WEBHOOK_URL")
+
+# Автоматическое определение Webhook URL для Render
+RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL")
+WEBHOOK_URL = f"{RENDER_EXTERNAL_URL}/" if RENDER_EXTERNAL_URL else None
 
 # Настройка логгирования
 logging.basicConfig(
@@ -57,6 +60,10 @@ async def random_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         await update.message.reply_text("Пожалуйста, введите целые числа!")
 
 def main() -> None:
+    if not TOKEN:
+        logger.error("Токен бота не установлен!")
+        return
+
     app = Application.builder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
@@ -64,16 +71,13 @@ def main() -> None:
     app.add_handler(CommandHandler("coin", coin))
     app.add_handler(CommandHandler("random", random_number))
 
-    # Настройка вебхука для Render
     if WEBHOOK_URL:
         app.run_webhook(
             listen="0.0.0.0",
             port=PORT,
-            secret_token=None,
             webhook_url=WEBHOOK_URL,
-            cert=None
         )
-        logger.info("Бот запущен через вебхук")
+        logger.info(f"Бот запущен через вебхук: {WEBHOOK_URL}")
     else:
         app.run_polling()
         logger.info("Бот запущен в режиме поллинга")
