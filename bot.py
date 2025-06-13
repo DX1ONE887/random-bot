@@ -4,7 +4,7 @@ import os
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
-# Загрузка переменных окружения (безопасно)
+# Загрузка переменных окружения
 TOKEN = "7977098044:AAFYGhAaAaK_ru4xgdZnjQTJhUTa6l04pA8"  # Токен из переменных окружения
 PORT = int(os.getenv("PORT", 8443))
 
@@ -61,7 +61,7 @@ async def random_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
 def main() -> None:
     if not TOKEN:
-        logger.error("Токен бота не установлен!")
+        logger.error("Токен бота не установлен! Укажите переменную окружения TOKEN.")
         return
 
     app = Application.builder().token(TOKEN).build()
@@ -72,15 +72,21 @@ def main() -> None:
     app.add_handler(CommandHandler("random", random_number))
 
     if WEBHOOK_URL:
+        # Удаляем завершающий слэш для корректного формирования URL
+        webhook_url = WEBHOOK_URL.rstrip('/')
+        full_webhook_url = f"{webhook_url}/webhook"
+        
+        logger.info(f"Запуск через вебхук: {full_webhook_url}")
+        
         app.run_webhook(
             listen="0.0.0.0",
             port=PORT,
-            webhook_url=WEBHOOK_URL,
+            webhook_url=full_webhook_url,
+            url_path="webhook",  # Указываем путь для вебхука
         )
-        logger.info(f"Бот запущен через вебхук: {WEBHOOK_URL}")
     else:
+        logger.info("Запуск в режиме поллинга")
         app.run_polling()
-        logger.info("Бот запущен в режиме поллинга")
 
 if __name__ == "__main__":
     main()
